@@ -1,21 +1,25 @@
 package org.example.musicmood.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "users") // H2에서 'USER'는 예약어라 오류가 날 수 있어서 'users'로 이름 변경
+@Table(name = "USERS") // USER는 DB 예약어일 수 있어서 USERS로 지정!
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Setter
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
-    private String nickname;
+    @Column(unique = true, nullable = false)
+    private String loginId; // 이메일 대신 사용할 로그인 아이디!
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(unique = true, nullable = false)
+    private String nickname; // 닉네임도 중복 불가!
 }
