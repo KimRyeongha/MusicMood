@@ -12,7 +12,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/join" element={<Join />} />
-                <Route path="/mypage" element={<MyPage />} /> {/* 🌟 마이페이지 길 연결 완료! */}
+                <Route path="/mypage" element={<MyPage />} /> 
                 <Route path="/admin" element={<AdminStats />} />
             </Routes>
         </BrowserRouter>

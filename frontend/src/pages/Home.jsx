@@ -6,20 +6,16 @@ function Home() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
 
-    // --- 상태 관리 ---
-    const [musicList, setMusicList] = useState([]); // 서버에서 가져온 전체 노래 목록
+    const [musicList, setMusicList] = useState([]);
     const [videoId, setVideoId] = useState('');
     const [moodTag, setMoodTag] = useState('#코딩할때');
     const [selectedTag, setSelectedTag] = useState('전체');
 
-    // 직접 입력 관련 상태
     const [isCustomTag, setIsCustomTag] = useState(false);
     const [customTagInput, setCustomTagInput] = useState('');
 
-    // 내가 좋아요 누른 노래 번호(ID)들을 기억할 상태
     const [likedMusicIds, setLikedMusicIds] = useState([]);
 
-    // 1. 서버에서 "모든 노래" 가져오기
     const fetchAllMusic = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/music/all');
@@ -29,17 +25,15 @@ function Home() {
         }
     };
 
-    // 내가 좋아요 누른 노래 번호들만 쏙쏙 뽑아오기
     const fetchLikedMusicIds = async (loginId) => {
         try {
             const response = await axios.get(`http://localhost:8080/api/music/liked-ids?loginId=${loginId}`);
-            setLikedMusicIds(response.data);
+            setLikedMusicIds(response.data.map(id => Number(id))); // ✅ 명시적으로 Number 변환
         } catch (error) {
             console.error('좋아요 목록 가져오기 실패:', error);
         }
     };
 
-    // 2. 앱 실행 시 로그인 체크 & 데이터 로딩
     useEffect(() => {
         const loggedInUser = localStorage.getItem('user');
         if (!loggedInUser) {
@@ -48,24 +42,21 @@ function Home() {
         } else {
             const parsedUser = JSON.parse(loggedInUser);
             setUser(parsedUser);
-            fetchAllMusic(); // 로그인 확인되면 전체 노래 불러오기!
-            fetchLikedMusicIds(parsedUser.loginId); // 로그인 확인되면 하트 목록도 가져오기!
+            fetchAllMusic();
+            fetchLikedMusicIds(parsedUser.loginId);
         }
     }, [navigate]);
 
-    // 3. 새로운 노래 저장하기
     const handleSave = async () => {
         if (!videoId) {
             alert('유튜브 ID를 입력해주세요!');
             return;
         }
-
         if (isCustomTag && !customTagInput.trim()) {
             alert('직접 입력할 감성 태그를 적어주세요!');
             return;
         }
 
-        // 직접 입력 태그일 경우 앞에 # 붙여주기
         const finalTag = isCustomTag
             ? (customTagInput.startsWith('#') ? customTagInput : `#${customTagInput}`)
             : moodTag;
@@ -75,19 +66,18 @@ function Home() {
                 videoId: videoId,
                 moodTag: finalTag,
                 loginId: user.loginId,
-                nickname: user.nickname // 🌟 [추가] 서버로 보낼 때 내 닉네임도 같이 포장해서 쏘기!
+                nickname: user.nickname
             });
             alert('저장 성공!');
             setVideoId('');
             setCustomTagInput('');
-            fetchAllMusic(); // 저장 후 리스트 새로고침
+            fetchAllMusic();
         } catch (error) {
             console.error('저장 실패:', error);
             alert('저장에 실패했습니다.');
         }
     };
 
-    // 하트 버튼을 눌렀을 때 실행되는 함수!
     const handleToggleLike = async (musicId) => {
         try {
             await axios.post(`http://localhost:8080/api/music/${musicId}/like?loginId=${user.loginId}`);
@@ -97,26 +87,18 @@ function Home() {
         }
     };
 
-    // 4. 로그아웃
     const handleLogout = () => {
         localStorage.removeItem('user');
         alert('로그아웃 되었습니다.');
         navigate('/login');
     };
 
-    // 유저 정보 로딩 전 빈 화면 방지
     if (!user) return null;
 
-    // ==========================================
-    // 🌟 5. 리스트 분리 및 필터링 로직
-    // ==========================================
-
-    // [관리자 추천 리스트] -> admin이 올린 곡 + 선택한 태그 필터링 적용
     const adminMusicList = musicList.filter(music =>
         music.loginId === 'admin' && (selectedTag === '전체' || music.moodTag === selectedTag)
     );
 
-    // [소셜 플레이리스트] -> 일반 유저가 올린 곡 모두 다 + 최신순(reverse) 정렬
     const socialMusicList = musicList
         .filter(music => music.loginId !== 'admin')
         .reverse();
@@ -124,32 +106,24 @@ function Home() {
     return (
         <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
 
-            {/* 상단 헤더 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #eee' }}>
                 <h1 style={{ margin: 0 }}>🎵 My Mood, My Music (M3)</h1>
                 <div>
                     <span style={{ marginRight: '15px', fontWeight: 'bold' }}>{user.nickname} 님 환영합니다!</span>
-
-                    {/* 최고관리자 전용 버튼 */}
                     {user.loginId === 'admin' && (
                         <button onClick={() => navigate('/admin')} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
                             ⚙️ 시스템 통계
                         </button>
                     )}
-
-                    {/* 마이페이지 버튼 */}
                     <button onClick={() => navigate('/mypage')} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
                         👤 마이페이지
                     </button>
-
-                    {/* 로그아웃 버튼 */}
                     <button onClick={handleLogout} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#ff4d4f', color: 'white', border: 'none', borderRadius: '5px' }}>
                         로그아웃
                     </button>
                 </div>
             </div>
 
-            {/* 음악 추가 섹션 */}
             <div style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '8px' }}>
                 <h3>새로운 음악 추가하기</h3>
                 <input
@@ -159,7 +133,6 @@ function Home() {
                     onChange={(e) => setVideoId(e.target.value)}
                     style={{ padding: '8px', marginRight: '10px', width: '200px' }}
                 />
-
                 <select
                     value={isCustomTag ? "직접입력" : moodTag}
                     onChange={(e) => {
@@ -189,7 +162,6 @@ function Home() {
                     <option value="#스트레스해소">#스트레스해소</option>
                     <option value="직접입력">직접입력</option>
                 </select>
-
                 {isCustomTag && (
                     <input
                         type="text"
@@ -199,13 +171,11 @@ function Home() {
                         style={{ padding: '8px', marginRight: '10px', width: '150px' }}
                     />
                 )}
-
                 <button onClick={handleSave} style={{ padding: '8px 16px', cursor: 'pointer', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px' }}>
                     저장
                 </button>
             </div>
 
-            {/* 태그 필터 버튼들 (관리자 픽에만 적용됨) */}
             <div style={{ marginBottom: '30px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {['전체', '#코딩할때', '#새벽감성', '#신나는날', '#비오는날', '#몽글몽글', '#드라이브'].map(tag => (
                     <button
@@ -222,7 +192,6 @@ function Home() {
                 ))}
             </div>
 
-            {/* 👑 관리자 공식 추천 영역 */}
             <h2 style={{ color: '#ff8c00' }}>👑 M3 추천 플레이리스트</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px', marginBottom: '50px' }}>
                 {adminMusicList.length > 0 ? adminMusicList.map((music) => (
@@ -230,20 +199,18 @@ function Home() {
                         <a href={`https://www.youtube.com/watch?v=${music.videoId}`} target="_blank" rel="noopener noreferrer">
                             <img src={`https://img.youtube.com/vi/${music.videoId}/mqdefault.jpg`} alt={music.title} style={{ width: '100%', borderRadius: '4px' }} />
                         </a>
-
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px 0 5px 0' }}>
                             <h4 style={{ margin: 0, width: '85%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{music.title || '제목 없음'}</h4>
                             <span onClick={() => handleToggleLike(music.id)} style={{ cursor: 'pointer', fontSize: '20px' }}>
-                                {likedMusicIds.includes(music.id) ? '❤️' : '🤍'}
+                                {likedMusicIds.includes(Number(music.id)) ? '❤️' : '🤍'}
                             </span>
                         </div>
-
                         <span style={{ color: '#ff8c00', fontWeight: 'bold' }}>{music.moodTag}</span>
+                        {/* ✅ 관리자 추천곡에는 올린이 표시 없음 */}
                     </div>
                 )) : <p style={{ color: '#888' }}>해당 태그의 공식 추천곡이 없습니다.</p>}
             </div>
 
-            {/* 🎧 모두의 소셜 플레이리스트 영역 (최신순) */}
             <h2 style={{ color: '#007bff' }}>🎧 모두의 플레이리스트</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
                 {socialMusicList.length > 0 ? socialMusicList.map((music) => (
@@ -251,18 +218,15 @@ function Home() {
                         <a href={`https://www.youtube.com/watch?v=${music.videoId}`} target="_blank" rel="noopener noreferrer">
                             <img src={`https://img.youtube.com/vi/${music.videoId}/mqdefault.jpg`} alt={music.title} style={{ width: '100%', borderRadius: '4px' }} />
                         </a>
-
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px 0 5px 0' }}>
                             <h4 style={{ margin: 0, width: '85%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{music.title || '제목 없음'}</h4>
                             <span onClick={() => handleToggleLike(music.id)} style={{ cursor: 'pointer', fontSize: '20px' }}>
-                                {likedMusicIds.includes(music.id) ? '❤️' : '🤍'}
+                                {likedMusicIds.includes(Number(music.id)) ? '❤️' : '🤍'}
                             </span>
                         </div>
-
                         <span style={{ color: '#007bff', fontWeight: 'bold', marginRight: '10px' }}>{music.moodTag}</span>
-
-                        {/* 🌟 [수정] 아이디 대신 닉네임이 먼저 보이도록 수정! (닉네임 없으면 아이디 띄움) */}
-                        <span style={{ fontSize: '12px', color: '#666' }}>올린이 : {music.nickname || music.loginId || '알수없음'}</span>
+                        {/* ✅ "계정명" → "올린이 - 닉네임" 형식으로 변경 */}
+                        <span style={{ fontSize: '12px', color: '#666' }}>올린이 - {music.nickname || music.loginId || '알수없음'}</span>
                     </div>
                 )) : <p style={{ color: '#888' }}>아직 등록된 소셜 추천곡이 없습니다.</p>}
             </div>

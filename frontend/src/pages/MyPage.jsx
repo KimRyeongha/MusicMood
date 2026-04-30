@@ -6,10 +6,7 @@ function MyPage() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
 
-    // 닉네임 변경 상태
     const [newNickname, setNewNickname] = useState('');
-
-    // 비밀번호 변경 상태 (3개로 분리!)
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -72,12 +69,10 @@ function MyPage() {
             alert('비밀번호 변경 항목을 모두 입력해주세요!');
             return;
         }
-
         if (newPassword !== confirmPassword) {
             alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
             return;
         }
-
         try {
             const response = await axios.put('http://localhost:8080/api/user/update/password', {
                 loginId: user.loginId,
@@ -120,9 +115,7 @@ function MyPage() {
                 </button>
             </div>
 
-            {/* 회원정보 수정 섹션 */}
             <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-                {/* 닉네임 변경 박스 */}
                 <div style={{ flex: 1, padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px solid #ddd' }}>
                     <h3 style={{ marginTop: 0 }}>닉네임 변경</h3>
                     <p style={{ color: '#666', fontSize: '14px' }}>아이디: <b>{user.loginId}</b></p>
@@ -138,7 +131,6 @@ function MyPage() {
                     </div>
                 </div>
 
-                {/* 비밀번호 변경 박스 */}
                 <div style={{ flex: 1, padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px solid #ddd' }}>
                     <h3 style={{ marginTop: 0 }}>비밀번호 변경</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -168,7 +160,6 @@ function MyPage() {
                 </div>
             </div>
 
-            {/* 내가 올린 플레이리스트 섹션 */}
             <h2 style={{ color: '#8a2be2' }}>🎵 내가 올린 플레이리스트 ({myMusicList.length}곡)</h2>
             <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {['전체', '#코딩할때', '#새벽감성', '#신나는날', '#그루비'].map(tag => (
@@ -198,7 +189,6 @@ function MyPage() {
                 )) : <p style={{ color: '#888' }}>해당 태그에 등록한 내 음악이 없습니다.</p>}
             </div>
 
-            {/* 🌟 수정된 '내가 찜한 플레이리스트' 섹션 */}
             <h2 style={{ color: '#e0245e' }}>❤️ 내가 찜한 플레이리스트 ({likedMusicList.length}곡)</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px', marginBottom: '50px' }}>
                 {likedMusicList.length > 0 ? likedMusicList.map((music) => (
@@ -206,19 +196,15 @@ function MyPage() {
                         <a href={`https://www.youtube.com/watch?v=${music.videoId}`} target="_blank" rel="noopener noreferrer">
                             <img src={`https://img.youtube.com/vi/${music.videoId}/mqdefault.jpg`} alt={music.title} style={{ width: '100%', borderRadius: '4px' }} />
                         </a>
-
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px 0 5px 0' }}>
                             <h4 style={{ margin: 0, width: '85%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{music.title || '제목 없음'}</h4>
                             <span onClick={() => handleToggleLike(music.id)} style={{ cursor: 'pointer', fontSize: '20px' }}>❤️</span>
                         </div>
-
                         <span style={{ color: '#e0245e', fontWeight: 'bold', marginRight: '10px' }}>{music.moodTag}</span>
-
-                        {/* 🌟 핵심 로직: 관리자면 '공식 추천', 유저면 '닉네임' 띄우기! */}
                         {music.loginId === 'admin' ? (
                             <span style={{ fontSize: '12px', color: '#ff8c00', fontWeight: 'bold' }}>👑 공식 추천곡</span>
                         ) : (
-                            <span style={{ fontSize: '12px', color: '#666' }}>올린이 : {music.nickname || music.loginId || '알수없음'}</span>
+                            <span style={{ fontSize: '12px', color: '#666' }}>올린이 - {music.nickname || music.loginId || '알수없음'}</span>
                         )}
                     </div>
                 )) : <p style={{ color: '#888' }}>아직 하트를 누른 곡이 없습니다. 홈에서 마음에 드는 곡을 찜해보세요!</p>}
