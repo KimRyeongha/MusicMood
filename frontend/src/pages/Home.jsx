@@ -28,7 +28,7 @@ function Home() {
     const fetchLikedMusicIds = async (loginId) => {
         try {
             const response = await axios.get(`http://localhost:8080/api/music/liked-ids?loginId=${loginId}`);
-            setLikedMusicIds(response.data.map(id => Number(id))); // ✅ 명시적으로 Number 변환
+            setLikedMusicIds(response.data.map(id => Number(id)));
         } catch (error) {
             console.error('좋아요 목록 가져오기 실패:', error);
         }
@@ -47,11 +47,23 @@ function Home() {
         }
     }, [navigate]);
 
+    const extractVideoId = (input) => {
+        if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+        const urlMatch = input.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+        if (urlMatch) return urlMatch[1];
+        const shortMatch = input.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+        if (shortMatch) return shortMatch[1];
+        return null;
+    };
+
     const handleSave = async () => {
-        if (!videoId) {
-            alert('유튜브 ID를 입력해주세요!');
+        const extractedId = extractVideoId(videoId);
+        
+        if (!extractedId) {
+            alert('유효한 유튜브 링크 또는 Video ID를 입력해주세요!');
             return;
         }
+        
         if (isCustomTag && !customTagInput.trim()) {
             alert('직접 입력할 감성 태그를 적어주세요!');
             return;
@@ -63,7 +75,7 @@ function Home() {
 
         try {
             await axios.post('http://localhost:8080/api/music/save', {
-                videoId: videoId,
+                videoId: extractedId, 
                 moodTag: finalTag,
                 loginId: user.loginId,
                 nickname: user.nickname
@@ -128,10 +140,10 @@ function Home() {
                 <h3>새로운 음악 추가하기</h3>
                 <input
                     type="text"
-                    placeholder="유튜브 ID (예: hvOwe-1D-0Q)"
+                    placeholder="유튜브 링크" // 
                     value={videoId}
                     onChange={(e) => setVideoId(e.target.value)}
-                    style={{ padding: '8px', marginRight: '10px', width: '200px' }}
+                    style={{ padding: '8px', marginRight: '10px', width: '350px' }}
                 />
                 <select
                     value={isCustomTag ? "직접입력" : moodTag}
@@ -206,7 +218,6 @@ function Home() {
                             </span>
                         </div>
                         <span style={{ color: '#ff8c00', fontWeight: 'bold' }}>{music.moodTag}</span>
-                        {/* ✅ 관리자 추천곡에는 올린이 표시 없음 */}
                     </div>
                 )) : <p style={{ color: '#888' }}>해당 태그의 공식 추천곡이 없습니다.</p>}
             </div>
@@ -225,7 +236,6 @@ function Home() {
                             </span>
                         </div>
                         <span style={{ color: '#007bff', fontWeight: 'bold', marginRight: '10px' }}>{music.moodTag}</span>
-                        {/* ✅ "계정명" → "올린이 - 닉네임" 형식으로 변경 */}
                         <span style={{ fontSize: '12px', color: '#666' }}>올린이 - {music.nickname || music.loginId || '알수없음'}</span>
                     </div>
                 )) : <p style={{ color: '#888' }}>아직 등록된 소셜 추천곡이 없습니다.</p>}
