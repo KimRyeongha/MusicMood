@@ -140,7 +140,7 @@ function Home() {
                 <h3>새로운 음악 추가하기</h3>
                 <input
                     type="text"
-                    placeholder="유튜브 링크" // 
+                    placeholder="유튜브 링크" 
                     value={videoId}
                     onChange={(e) => setVideoId(e.target.value)}
                     style={{ padding: '8px', marginRight: '10px', width: '350px' }}
