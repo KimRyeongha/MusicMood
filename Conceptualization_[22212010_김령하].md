@@ -6,6 +6,7 @@
 | Revision date | Version # | Description | Author |
 | :--- | :--- | :--- | :--- |
 | 2026.03.26 | 1.0.0 | 초안 | 김령하 |
+| 2026.06.03 | 1.0.1 | 일부 용어 수정 | 김령하 |
 
 
 ---
@@ -71,14 +72,14 @@
 | **User, Administrator** | **1) Login/Logout** | 이용자와 관리자가 자신의 계정으로 시스템에 로그인하거나 로그아웃한다. |
 | **User, Administrator** | **2) Join** | 새로운 이용자와 최초 관리자가 자신의 계정 정보를 등록한다. |
 | **User** | **3) Mypage** | 이용자는 자신의 닉네임 변경이 가능하고 자신이 만든 플레이리스트를 볼 수 있다. |
-| **User** | **4) Register Music** | 이용자가 등록하고 싶은 유튜브 영상의 고유 Video ID와 태그를 입력하여 음악 등록 요청을 한다. |
+| **User** | **4) Register Music** | 이용자가 등록하고 싶은 유튜브 영상의 링크와 태그를 입력하여 음악 등록 요청을 한다. |
 | **User** | **5) Filter by Mood Tag** | 원하는 태그를 선택하고, 부합한 음악 목록만 필터링을 요청하고 제공한다. |
 | **User** | **6) View My Playlist** | 직접 등록한 플레이리스트 조회 및 관리할 수 있다. |
 | **User** | **7) View Social Playlist** | 타 유저가 등록한 플레이리스트를 조회할 수 있다. |
 | **User** | **8) Like Playlist** | 마음에 드는 곡에 좋아요를 누를 수 있다. |
 | **System** | **9) Confirm Music Saved** | 시스템이 음악 등록을 성공하면 알림 화면을 띄워준다. |
 | **System** | **10) Give Playlist Data** | 플레이리스트 조회 요청을 받으면 데이터베이스에서 추출한 음악 목록 데이터를 전송한다. |
-| **System** | **11) Request Video Data** | 입력받은 Video ID의 데이터를 확보하기 위해 YouTube API 서버로 정보 제공을 요청한다. |
+| **System** | **11) Request Video Data** | 입력받은 링크의 Video ID 데이터를 확보하기 위해 YouTube API 서버로 정보 제공을 요청한다. |
 | **YouTube API** | **12) Give Video Data** | YouTube API가 유효성을 검증하고, 해당 영상의 제목과 썸네일을 전달한다. |
 | **Administrator** | **13) View System Statistics** | 총 가입자 수와 등록된 노래의 개수의 데이터 통계를 조회할 수 있다.|
 | **Administrator** | **14) Register Official Music** | 샘플 곡들을 미리 등록하여 이용자들에게 제공한다. |
@@ -120,7 +121,7 @@
 | Category | Description |
 | :--- | :--- |
 | Purpose | 선호하는 유튜브 음악을 태그 기반 플레이리스트에 등록하기 위함이다. |
-| Approach | 유튜브 영상의 11자리 Video ID와 원하는 태그를 고르거나 입력하고, 저장 버튼을 눌러 시스템에 등록을 요청한다. |
+| Approach | 유튜브 영상의 링크와 원하는 태그를 고르거나 입력하고, 저장 버튼을 눌러 시스템에 등록을 요청한다. |
 | Dynamics | 마음에 드는 유튜브 음악을 자신의 리스트에 등록하거나 타인에게 추천하고 싶을 경우 |
 | Goals | 입력된 ID와 태그 정보를 바탕으로 음악 데이터를 시스템 데이터베이스에 추가한다. |
 
@@ -182,7 +183,7 @@
 
 | Category | Description |
 | :--- | :--- |
-| Purpose | 이용자가 입력한 Video ID만으로는 알 수 없는 실제 영상의 썸네일과 제목 정보를 획득하기 위함이다. |
+| Purpose | 이용자가 입력한 링크만으로는 알 수 없는 실제 영상의 썸네일과 제목 정보를 획득하기 위함이다. |
 | Approach | 시스템이 유튜브 Data API v3 서버로 해당 Video ID를 포함한 GET 방식의 데이터 제공 요청을 보낸다. |
 | Dynamics | 이용자가 새로운 음악 등록을 요청했을 때 내부 로직으로 자동 발생 |
 | Goals | 외부 API와의 원활한 통신을 통해 음악 메타데이터 확보를 시도한다. |
