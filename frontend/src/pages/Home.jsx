@@ -60,7 +60,7 @@ function Home() {
         const extractedId = extractVideoId(videoId);
         
         if (!extractedId) {
-            alert('유효한 유튜브 링크 또는 Video ID를 입력해주세요!');
+            alert('유효한 링크를 입력해주세요!');
             return;
         }
         
