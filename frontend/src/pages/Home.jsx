@@ -264,7 +264,7 @@ function Home() {
             {showLoginModal && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
                     <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '10px', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                        <h3 style={{ marginTop: 0, color: '#333' }}>로그인이 필요합니다 🔒</h3>
+                        <h3 style={{ marginTop: 0, color: '#333' }}>🔒 로그인이 필요합니다</h3>
                         <p style={{ color: '#666', marginBottom: '20px' }}>나만의 플레이리스트를 만들고 좋아요를 눌러보세요!</p>
                         <button onClick={() => navigate('/login')} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', marginRight: '10px' }}>
                             로그인하러 가기

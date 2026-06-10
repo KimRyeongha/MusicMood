@@ -207,7 +207,7 @@ function MyPage() {
                             <span style={{ fontSize: '12px', color: '#666' }}>올린이 - {music.nickname || music.loginId || '알수없음'}</span>
                         )}
                     </div>
-                )) : <p style={{ color: '#888' }}>아직 하트를 누른 곡이 없습니다. 홈에서 마음에 드는 곡을 찜해보세요!</p>}
+                )) : <p style={{ color: '#888' }}>아직 하트를 누른 곡이 없습니다.<br /> 홈에서 마음에 드는 곡을 찜해보세요!</p>}
             </div>
 
         </div>
