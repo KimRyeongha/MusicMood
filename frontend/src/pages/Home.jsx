@@ -15,6 +15,9 @@ function Home() {
     const [customTagInput, setCustomTagInput] = useState('');
 
     const [likedMusicIds, setLikedMusicIds] = useState([]);
+    
+    // 모달 상태 관리를 위한 state 추가
+    const [showLoginModal, setShowLoginModal] = useState(false);
 
     const fetchAllMusic = async () => {
         try {
@@ -36,15 +39,13 @@ function Home() {
 
     useEffect(() => {
         const loggedInUser = localStorage.getItem('user');
-        if (!loggedInUser) {
-            alert('로그인이 필요한 서비스입니다!');
-            navigate('/login');
-        } else {
+        if (loggedInUser) {
             const parsedUser = JSON.parse(loggedInUser);
             setUser(parsedUser);
-            fetchAllMusic();
             fetchLikedMusicIds(parsedUser.loginId);
         }
+        // 비회원도 음악 목록을 볼 수 있도록 조건문 밖으로 이동
+        fetchAllMusic();
     }, [navigate]);
 
     const extractVideoId = (input) => {
@@ -57,6 +58,12 @@ function Home() {
     };
 
     const handleSave = async () => {
+        // 비회원이 저장 시도 시 모달 호출
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
+
         const extractedId = extractVideoId(videoId);
         
         if (!extractedId) {
@@ -91,6 +98,12 @@ function Home() {
     };
 
     const handleToggleLike = async (musicId) => {
+        // 비회원이 좋아요 시도 시 모달 호출
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
+
         try {
             await axios.post(`http://localhost:8080/api/music/${musicId}/like?loginId=${user.loginId}`);
             fetchLikedMusicIds(user.loginId);
@@ -102,10 +115,9 @@ function Home() {
     const handleLogout = () => {
         localStorage.removeItem('user');
         alert('로그아웃 되었습니다.');
+        setUser(null);
         navigate('/login');
     };
-
-    if (!user) return null;
 
     const adminMusicList = musicList.filter(music =>
         music.loginId === 'admin' && (selectedTag === '전체' || music.moodTag === selectedTag)
@@ -121,18 +133,26 @@ function Home() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #eee' }}>
                 <h1 style={{ margin: 0 }}>🎵 My Mood, My Music (M3)</h1>
                 <div>
-                    <span style={{ marginRight: '15px', fontWeight: 'bold' }}>{user.nickname} 님 환영합니다!</span>
-                    {user.loginId === 'admin' && (
-                        <button onClick={() => navigate('/admin')} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
-                            ⚙️ 시스템 통계
+                    {user ? (
+                        <>
+                            <span style={{ marginRight: '15px', fontWeight: 'bold' }}>{user.nickname} 님 환영합니다!</span>
+                            {user.loginId === 'admin' && (
+                                <button onClick={() => navigate('/admin')} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
+                                    ⚙️ 시스템 통계
+                                </button>
+                            )}
+                            <button onClick={() => navigate('/mypage')} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
+                                👤 마이페이지
+                            </button>
+                            <button onClick={handleLogout} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#ff4d4f', color: 'white', border: 'none', borderRadius: '5px' }}>
+                                로그아웃
+                            </button>
+                        </>
+                    ) : (
+                        <button onClick={() => navigate('/login')} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px' }}>
+                            로그인
                         </button>
                     )}
-                    <button onClick={() => navigate('/mypage')} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: '5px', marginRight: '10px' }}>
-                        👤 마이페이지
-                    </button>
-                    <button onClick={handleLogout} style={{ padding: '8px 15px', cursor: 'pointer', backgroundColor: '#ff4d4f', color: 'white', border: 'none', borderRadius: '5px' }}>
-                        로그아웃
-                    </button>
                 </div>
             </div>
 
@@ -240,6 +260,21 @@ function Home() {
                     </div>
                 )) : <p style={{ color: '#888' }}>아직 등록된 소셜 추천곡이 없습니다.</p>}
             </div>
+
+            {showLoginModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+                    <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '10px', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                        <h3 style={{ marginTop: 0, color: '#333' }}>로그인이 필요합니다 🔒</h3>
+                        <p style={{ color: '#666', marginBottom: '20px' }}>나만의 플레이리스트를 만들고 좋아요를 눌러보세요!</p>
+                        <button onClick={() => navigate('/login')} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', marginRight: '10px' }}>
+                            로그인하러 가기
+                        </button>
+                        <button onClick={() => setShowLoginModal(false)} style={{ padding: '10px 20px', backgroundColor: '#ccc', color: '#333', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                            둘러보기
+                        </button>
+                    </div>
+                </div>
+            )}
 
         </div>
     );
