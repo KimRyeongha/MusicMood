@@ -90,4 +90,21 @@ public class MusicController {
                 .collect(Collectors.toList());
         return musicRepository.findAllById(likedMusicIds);
     }
+
+    // 7. 내가 올린 노래 삭제
+    @DeleteMapping("/delete/{musicId}")
+    public ResponseEntity<String> deleteMusic(@PathVariable("musicId") Long musicId, @RequestParam("loginId") String loginId) {
+        Optional<Music> musicOpt = musicRepository.findById(musicId);
+        
+        if (musicOpt.isPresent()) {
+            Music music = musicOpt.get();
+            if (music.getLoginId().equals(loginId) || "admin".equals(loginId)) {
+                musicRepository.delete(music);
+                return ResponseEntity.ok("삭제 완료");
+            } else {
+                return ResponseEntity.status(403).body("삭제 권한이 없습니다.");
+            }
+        }
+        return ResponseEntity.badRequest().body("노래를 찾을 수 없습니다.");
+    }
 }

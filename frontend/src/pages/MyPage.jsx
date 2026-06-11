@@ -15,6 +15,10 @@ function MyPage() {
     const [likedMusicList, setLikedMusicList] = useState([]);
     const [selectedTag, setSelectedTag] = useState('전체');
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [musicToDelete, setMusicToDelete] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
     const fetchMyMusic = async (loginId) => {
         try {
             const response = await axios.get(`http://localhost:8080/api/music/list?loginId=${loginId}`);
@@ -96,6 +100,21 @@ function MyPage() {
             fetchLikedMusic(user.loginId);
         } catch (error) {
             console.error('좋아요 처리 실패:', error);
+        }
+    };
+
+    const handleDeleteMusic = async () => {
+        if (!musicToDelete) return;
+        try {
+            await axios.delete(`http://localhost:8080/api/music/delete/${musicToDelete}?loginId=${user.loginId}`);
+            setShowDeleteModal(false); 
+            setMusicToDelete(null);    
+            fetchMyMusic(user.loginId); 
+            setShowSuccessModal(true); 
+        } catch (error) {
+            alert(`삭제 실패: ${error.response?.data || '오류가 발생했습니다.'}`);
+            setShowDeleteModal(false);
+            setMusicToDelete(null);
         }
     };
 
@@ -183,8 +202,18 @@ function MyPage() {
                         <a href={`https://www.youtube.com/watch?v=${music.videoId}`} target="_blank" rel="noopener noreferrer">
                             <img src={`https://img.youtube.com/vi/${music.videoId}/mqdefault.jpg`} alt={music.title} style={{ width: '100%', borderRadius: '4px' }} />
                         </a>
-                        <h4 style={{ margin: '10px 0 5px 0' }}>{music.title || '제목 없음'}</h4>
-                        <span style={{ color: '#8a2be2', fontWeight: 'bold' }}>{music.moodTag}</span>
+                        <h4 style={{ margin: '10px 0 5px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{music.title || '제목 없음'}</h4>
+                        
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ color: '#8a2be2', fontWeight: 'bold' }}>{music.moodTag}</span>
+                            <span 
+                                onClick={() => { setMusicToDelete(music.id); setShowDeleteModal(true); }} 
+                                style={{ cursor: 'pointer', fontSize: '18px' }} 
+                                title="삭제하기"
+                            >
+                                🗑️
+                            </span>
+                        </div>
                     </div>
                 )) : <p style={{ color: '#888' }}>해당 태그에 등록한 내 음악이 없습니다.</p>}
             </div>
@@ -209,6 +238,33 @@ function MyPage() {
                     </div>
                 )) : <p style={{ color: '#888' }}>아직 하트를 누른 곡이 없습니다.<br /> 홈에서 마음에 드는 곡을 찜해보세요!</p>}
             </div>
+
+            {showDeleteModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+                    <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '10px', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                        <h3 style={{ marginTop: 0, color: '#333' }}>🗑️ 정말 삭제하시겠습니까?</h3>
+                        <p style={{ color: '#666', marginBottom: '20px' }}>삭제한 노래는 플레이리스트에서 영구적으로 지워집니다.</p>
+                        <button onClick={handleDeleteMusic} style={{ padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', marginRight: '10px' }}>
+                            삭제하기
+                        </button>
+                        <button onClick={() => { setShowDeleteModal(false); setMusicToDelete(null); }} style={{ padding: '10px 20px', backgroundColor: '#ccc', color: '#333', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                            취소
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {showSuccessModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+                    <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '10px', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', minWidth: '250px' }}>
+                        <h3 style={{ marginTop: 0, color: '#333' }}>✔️ 삭제 완료</h3>
+                        <p style={{ color: '#666', marginBottom: '20px' }}>성공적으로 삭제되었습니다.</p>
+                        <button onClick={() => setShowSuccessModal(false)} style={{ padding: '6px 16px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '14px' }}>
+                            확인
+                        </button>
+                    </div>
+                </div>
+            )}
 
         </div>
     );
