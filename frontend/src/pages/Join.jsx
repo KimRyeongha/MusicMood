@@ -10,15 +10,14 @@ function Join() {
 
     const handleJoin = async () => {
         try {
-            await axios.post('http://localhost:8080/api/user/join', {
+            await axios.post('https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/user/join', {
                 loginId: loginId,
                 password: password,
                 nickname: nickname
             });
             alert('회원가입 성공! 로그인해주세요.');
-            navigate('/login'); // 성공하면 로그인 화면으로 슝!
+            navigate('/login'); 
         } catch (error) {
-            // 백엔드에서 던진 에러 메시지(중복 등)를 그대로 띄워줌!
             alert(error.response.data);
         }
     };

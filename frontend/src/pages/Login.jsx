@@ -9,18 +9,17 @@ function Login() {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/api/user/login', {
+            const response = await axios.post('https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/user/login', {
                 loginId: loginId,
                 password: password
             });
 
-            // 로그인 성공 시! 백엔드에서 받은 유저 정보(id, nickname 등)를 통째로 저장
             localStorage.setItem('user', JSON.stringify(response.data));
 
             alert(`${response.data.nickname}님 환영합니다!`);
-            navigate('/'); // 메인 홈 화면으로 이동!
+            navigate('/'); 
         } catch (error) {
-            alert(error.response.data); // 비번 틀림, 아이디 없음 등
+            alert(error.response.data); 
         }
     };
 

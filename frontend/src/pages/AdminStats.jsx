@@ -11,7 +11,7 @@ function AdminStats() {
     });
 
     useEffect(() => {
-        // 1. 관리자인지 철저하게 검사!
+        // 1. 관리자 검사
         const loggedInUser = localStorage.getItem('user');
         if (!loggedInUser) {
             alert('로그인이 필요합니다!');
@@ -26,10 +26,10 @@ function AdminStats() {
             return;
         }
 
-        // 2. 관리자가 맞으면 통계 데이터 싹 가져오기
+        // 2. 관리자가 맞으면 통계 데이터 가져오기
         const fetchStats = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/admin/stats');
+                const response = await axios.get('https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/admin/stats');
                 setStats(response.data);
             } catch (error) {
                 console.error('통계 데이터 불러오기 실패:', error);
@@ -51,7 +51,6 @@ function AdminStats() {
 
             <p style={{ color: '#666', marginBottom: '40px', fontSize: '18px' }}>현재 M3 서비스의 실시간 운영 현황입니다.</p>
 
-            {/* 통계 카드 3개 나란히 배치 */}
             <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
 
                 <div style={{ flex: 1, backgroundColor: '#e8f4f8', padding: '40px 20px', borderRadius: '15px', border: '2px solid #b6e3f4', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>

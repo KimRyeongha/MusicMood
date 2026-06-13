@@ -21,7 +21,7 @@ function MyPage() {
 
     const fetchMyMusic = async (loginId) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/music/list?loginId=${loginId}`);
+            const response = await axios.get(`https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/music/list?loginId=${loginId}`);
             setMyMusicList(response.data);
         } catch (error) {
             console.error('데이터 가져오기 실패:', error);
@@ -30,7 +30,7 @@ function MyPage() {
 
     const fetchLikedMusic = async (loginId) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/music/liked-music?loginId=${loginId}`);
+            const response = await axios.get(`https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/music/liked-music?loginId=${loginId}`);
             setLikedMusicList(response.data);
         } catch (error) {
             console.error('찜한 노래 가져오기 실패:', error);
@@ -56,7 +56,7 @@ function MyPage() {
             return;
         }
         try {
-            const response = await axios.put('http://localhost:8080/api/user/update/nickname', {
+            const response = await axios.put('https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/user/update/nickname', {
                 loginId: user.loginId,
                 newNickname: newNickname
             });
@@ -78,7 +78,7 @@ function MyPage() {
             return;
         }
         try {
-            const response = await axios.put('http://localhost:8080/api/user/update/password', {
+            const response = await axios.put('https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/user/update/password', {
                 loginId: user.loginId,
                 currentPassword: currentPassword,
                 newPassword: newPassword
@@ -96,7 +96,7 @@ function MyPage() {
 
     const handleToggleLike = async (musicId) => {
         try {
-            await axios.post(`http://localhost:8080/api/music/${musicId}/like?loginId=${user.loginId}`);
+            await axios.post(`https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/music/${musicId}/like?loginId=${user.loginId}`);
             fetchLikedMusic(user.loginId);
         } catch (error) {
             console.error('좋아요 처리 실패:', error);
@@ -106,7 +106,7 @@ function MyPage() {
     const handleDeleteMusic = async () => {
         if (!musicToDelete) return;
         try {
-            await axios.delete(`http://localhost:8080/api/music/delete/${musicToDelete}?loginId=${user.loginId}`);
+            await axios.delete(`https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/music/delete/${musicToDelete}?loginId=${user.loginId}`);
             setShowDeleteModal(false); 
             setMusicToDelete(null);    
             fetchMyMusic(user.loginId); 

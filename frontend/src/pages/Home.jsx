@@ -21,7 +21,7 @@ function Home() {
 
     const fetchAllMusic = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/music/all');
+            const response = await axios.get('https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/music/all');
             setMusicList(response.data);
         } catch (error) {
             console.error('데이터 가져오기 실패:', error);
@@ -30,7 +30,7 @@ function Home() {
 
     const fetchLikedMusicIds = async (loginId) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/music/liked-ids?loginId=${loginId}`);
+            const response = await axios.get(`https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/music/liked-ids?loginId=${loginId}`);
             setLikedMusicIds(response.data.map(id => Number(id)));
         } catch (error) {
             console.error('좋아요 목록 가져오기 실패:', error);
@@ -44,7 +44,6 @@ function Home() {
             setUser(parsedUser);
             fetchLikedMusicIds(parsedUser.loginId);
         }
-        // 비회원도 음악 목록을 볼 수 있도록 조건문 밖으로 이동
         fetchAllMusic();
     }, [navigate]);
 
@@ -58,7 +57,6 @@ function Home() {
     };
 
     const handleSave = async () => {
-        // 비회원이 저장 시도 시 모달 호출
         if (!user) {
             setShowLoginModal(true);
             return;
@@ -81,7 +79,7 @@ function Home() {
             : moodTag;
 
         try {
-            await axios.post('http://localhost:8080/api/music/save', {
+            await axios.post('https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/music/save', {
                 videoId: extractedId, 
                 moodTag: finalTag,
                 loginId: user.loginId,
@@ -98,14 +96,13 @@ function Home() {
     };
 
     const handleToggleLike = async (musicId) => {
-        // 비회원이 좋아요 시도 시 모달 호출
         if (!user) {
             setShowLoginModal(true);
             return;
         }
 
         try {
-            await axios.post(`http://localhost:8080/api/music/${musicId}/like?loginId=${user.loginId}`);
+            await axios.post(`https://port-0-musicmood-mqc1j4e6ba2e2cd6.sel3.cloudtype.app/api/music/${musicId}/like?loginId=${user.loginId}`);
             fetchLikedMusicIds(user.loginId);
         } catch (error) {
             console.error('좋아요 처리 실패:', error);
