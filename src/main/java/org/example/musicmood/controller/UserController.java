@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000") // 프론트엔드 연결 허용!
+@CrossOrigin(origins = "*") 
 public class UserController {
 
     private final UserService userService;
