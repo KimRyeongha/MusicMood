@@ -63,6 +63,7 @@ function MyPage() {
             localStorage.setItem('user', JSON.stringify(response.data));
             setUser(response.data);
             alert('닉네임이 성공적으로 변경되었습니다!');
+            navigate('/');
         } catch (error) {
             alert(`닉네임 변경 실패: ${error.response?.data || '오류가 발생했습니다.'}`);
         }

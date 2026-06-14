@@ -5,8 +5,10 @@ import org.example.musicmood.dto.MusicInfoDto;
 import org.example.musicmood.dto.MusicSaveRequestDto;
 import org.example.musicmood.entity.Music;
 import org.example.musicmood.entity.MusicLike;
+import org.example.musicmood.entity.User;
 import org.example.musicmood.repository.MusicLikeRepository;
 import org.example.musicmood.repository.MusicRepository;
+import org.example.musicmood.repository.UserRepository;
 import org.example.musicmood.service.YouTubeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,19 +26,23 @@ public class MusicController {
     private final YouTubeService youTubeService;
     private final MusicRepository musicRepository;
     private final MusicLikeRepository musicLikeRepository;
+    private final UserRepository userRepository;
 
     // 1. 노래 저장
     @PostMapping("/save")
     public String saveMusic(@RequestBody MusicSaveRequestDto request) {
         MusicInfoDto info = youTubeService.getVideoInfo(request.getVideoId());
 
+        User user = userRepository.findByLoginId(request.getLoginId())
+                .orElseThrow(() -> new RuntimeException("유저 없음"));
+
         Music music = Music.builder()
-                .id(null)
                 .videoId(request.getVideoId())
                 .title(info.getTitle())
                 .moodTag(request.getMoodTag())
                 .loginId(request.getLoginId())
                 .nickname(request.getNickname())
+                .user(user)
                 .build();
 
         musicRepository.save(music);
@@ -95,7 +101,7 @@ public class MusicController {
     @DeleteMapping("/delete/{musicId}")
     public ResponseEntity<String> deleteMusic(@PathVariable("musicId") Long musicId, @RequestParam("loginId") String loginId) {
         Optional<Music> musicOpt = musicRepository.findById(musicId);
-        
+
         if (musicOpt.isPresent()) {
             Music music = musicOpt.get();
             if (music.getLoginId().equals(loginId) || "admin".equals(loginId)) {

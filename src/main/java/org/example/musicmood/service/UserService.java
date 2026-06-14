@@ -47,15 +47,16 @@ public class UserService {
     public User updateNickname(String loginId, String newNickname) {
         User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 유저입니다."));
-        
+
         if (!user.getNickname().equals(newNickname) && userRepository.existsByNickname(newNickname)) {
             throw new RuntimeException("이미 사용 중인 닉네임입니다.");
         }
+        
+        int updated = musicRepository.updateNicknameByLoginId(loginId, newNickname);
+        System.out.println("업데이트된 Music 행 수: " + updated);
 
         user.setNickname(newNickname);
-        User savedUser = userRepository.save(user);
-        musicRepository.updateNicknameByLoginId(loginId, newNickname);
-        return savedUser;
+        return userRepository.save(user);
     }
 
     // 4. 비밀번호 변경 

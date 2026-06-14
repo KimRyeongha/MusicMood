@@ -15,8 +15,8 @@ public interface MusicRepository extends JpaRepository<Music, Long> {
     List<Music> findByMoodTag(String moodTag);
     List<Music> findAllByLoginId(String loginId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
     @Query("UPDATE Music m SET m.nickname = :newNickname WHERE m.loginId = :loginId")
-    void updateNicknameByLoginId(@Param("loginId") String loginId, @Param("newNickname") String newNickname);
+    int updateNicknameByLoginId(@Param("loginId") String loginId, @Param("newNickname") String newNickname);
 }
