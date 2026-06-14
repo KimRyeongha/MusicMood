@@ -17,6 +17,6 @@ public interface MusicRepository extends JpaRepository<Music, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE Music m SET m.uploader = :newNickname WHERE m.uploader = :oldNickname")
+    @Query("UPDATE Music m SET m.nickname = :newNickname WHERE m.nickname = :oldNickname")
     void updateUploaderNickname(@Param("oldNickname") String oldNickname, @Param("newNickname") String newNickname);
 }
