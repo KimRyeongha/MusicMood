@@ -52,10 +52,9 @@ public class UserService {
             throw new RuntimeException("이미 사용 중인 닉네임입니다.");
         }
 
-        String oldNickname = user.getNickname();
         user.setNickname(newNickname);
         User savedUser = userRepository.save(user);
-        musicRepository.updateUploaderNickname(oldNickname, newNickname);
+        musicRepository.updateNicknameByLoginId(loginId, newNickname);
         return savedUser;
     }
 
